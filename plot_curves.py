@@ -11,27 +11,39 @@ def func(x,a,b,c,d,e,f):
 with open("results.json") as file:
     pre_results = json.load(file)
 
-keys = pre_results.keys()
-keys = list(keys)
-pre_results = dict(pre_results)
-print(len(keys))
+main_keys = [("Daily Cases","Case"), ("Daily Deaths","Death"), ("Daily Tests", "Test")]
+for kind,happen in main_keys:
 
-for i in keys:
-    popt = pre_results[i]["Parameters"]
-    popt = np.array(popt)
-    ydata = pre_results[i]["Cases"]
-    xdata = range(1,len(ydata)+1)
-    xdata = np.array(xdata)
-    ydata = np.array(ydata)
+    keys = pre_results[kind].keys()
+    keys = list(keys)
+    results = dict(pre_results[kind])
+    print(len(keys))
 
-    plt.plot(xdata, ydata, 'b-', label=i)
-    xdata = range(1,len(ydata)+61)
-    plt.plot(xdata, func(xdata, *popt), 'r-', label='Fit')
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.legend()
-    plt.savefig("curves_up_to_date/"+str(i)+".png")
-    plt.clf()
+    for i in keys:
+        popt = results[i]["Parameters"]
+        popt = np.array(popt)
+        ydata = results[i]["Cases"]
+        xdata = range(1,len(ydata)+1)
+        backup_x = range(1,len(ydata)+1)
+        xdata = np.array(xdata)
+        ydata = np.array(ydata)
+
+        plt.plot(xdata, ydata, 'b-', label=i)
+        xdata = range(1,len(ydata)+61)
+        plt.plot(xdata, func(xdata, *popt), 'r-', label='Fit')
+        plt.xlabel('Days Since The First ' + str(happen) + ' Announced')
+        plt.ylabel("Number of Daily "+ happen + "s")
+        plt.legend()
+        plt.savefig("Graphs/60_days_"+ str(kind) + "/"+str(i)+".png")
+        plt.clf()
+        xdata = range(1,len(ydata)+31)
+        plt.plot(backup_x, ydata, 'b-', label=i)
+        plt.plot(xdata, func(xdata, *popt), 'r-', label='Fit')
+        plt.xlabel('Days Since The First ' + str(happen) + ' Announced')
+        plt.ylabel("Number of Daily "+ happen + "s")
+        plt.legend()
+        plt.savefig("Graphs/30_days_"+ str(kind) +"/"+str(i)+".png")
+        plt.clf()
 
 
 
