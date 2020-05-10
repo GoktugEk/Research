@@ -22,14 +22,8 @@ def func1(x, a, b, c,d,f,g):
 def func2(x,a,b,c,d,e,f,g):
     return x**b
 def func3(x,a,b,c,d,e,f):
-    return a*np.exp(-((x-b)/c)**2) + d*np.exp(-((x-e)/f)**2)
+    return a*np.exp(-((x-b)/c)**2) + d*np.exp(-((x-e)/f)**2) 
 
-
-def is_all_ones(l):
-    res = 1
-    for i in l:
-        if i != 1:
-            return 0 
 
 functions = {"func1" : "a^(b*x) + c^(d*x) + f^(g*x)", "func2" : "x^b","func3" : "a * e ^ -((x-b)/c)**2 + d * e ^ -((x-e)/f)**2 "}
 ydata = []
@@ -46,7 +40,7 @@ daily_death = 6
 daily_tests = 12
 
 situations = [(daily_case,"Daily Cases"),(daily_death,"Daily Deaths"),(daily_tests,"Daily Tests")]
-
+all_data.append("x,$")
 
 for case,kind in situations:
     i = 0 
@@ -54,12 +48,12 @@ for case,kind in situations:
 
         country_data = all_data[i].split(",")
 
-        a = random.randrange(5000)
-        b = random.randrange(5000)
-        c = random.randrange(5000)
-        d = random.randrange(5000)
-        e = random.randrange(5000)
-        f = random.randrange(5000)
+        a = random.randrange(500)
+        b = random.randrange(500)
+        c = random.randrange(500)
+        d = random.randrange(500)
+        e = random.randrange(500)
+        f = random.randrange(500)
         
         if country_data[case] != '' and int(float(country_data[case])) != 0:
             ydata.append(int(float(country_data[case])))
@@ -67,7 +61,7 @@ for case,kind in situations:
         if i+2 > len(all_data) or all_data[i+1].split(",")[1] != name:
             
 
-            if len(ydata)< 7:
+            if len(ydata)< 7 or name == "International" or name == "Jersey":
                 ydata = []
                 name = all_data[i+1].split(",")[1]
                 i+=1
@@ -83,17 +77,15 @@ for case,kind in situations:
             popt1,pcov1 = curve_fit(func1,xdata,ydata,maxfev = 99999999)
 
             func1_error = mean_absolute_error(ydata,func1(xdata, *popt1))
-            func2_error = mean_absolute_error(ydata,func2(xdata, *popt2))"""
-            popt3,pcov3 = curve_fit(func3,xdata,ydata, p0 = [a, b, c, d, e, f],maxfev = 9999999)   
-            popt2,pcov2 = curve_fit(func3,xdata,ydata,p0= None,maxfev = 99999999)   
+            func2_error = mean_absolute_error(ydata,func2(xdata, *popt2))""" 
+            popt3,pcov3 = curve_fit(func3,xdata,ydata, p0 = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5],maxfev = 9999999)  
+            popt2,pcov2 = curve_fit(func3,xdata,ydata,p0= None,maxfev = 99999999) 
             error_1 = mean_absolute_error(ydata,func3(xdata, *popt3))
             error_2 = mean_absolute_error(ydata,func3(xdata, *popt2))
-
+            
             popt3 = popt3.tolist()
-            popt2 = popt2.tolist() 
+            popt2 = popt2.tolist()
             ydata = ydata.tolist()
-
-
 
             if error_1 < error_2:
                 popt_results[kind][name] = {
@@ -108,7 +100,8 @@ for case,kind in situations:
                     "Function" : functions["func3"], 
                     "Cases" : ydata, 
                     "Error": error_2
-                    }      
+                    }  
+    
 
                 
 
