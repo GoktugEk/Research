@@ -7,6 +7,7 @@ from datetime import date
 commit_date = str(date.today())
 
 
+
 commit = 'git commit -m "' + commit_date + '"'
 
 t1 = time.time()
