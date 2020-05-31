@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import json
 import time
 
-def func(x,a,b,c,d,e,f):
-    return a*np.exp(-((x-b)/c)**2) + d*np.exp(-((x-e)/f)**2)
+def func(x,a,b,c):
+    return a*np.exp(-((x-b)/c)**2)
 
 
 
@@ -34,7 +34,7 @@ for kind,happen in main_keys:
         plt.xlabel('Days Since The First ' + str(happen) + ' Announced')
         plt.ylabel("Number of Daily "+ happen + "s")
         plt.legend()
-        plt.savefig("Graphs/60_days_"+ str(kind) + "/"+str(i)+".png")
+        plt.savefig("../Covid-19-Country-Graphs/60_days_"+ str(kind) + "/"+str(i)+".png")
         plt.clf()
         xdata = range(1,len(ydata)+31)
         plt.plot(backup_x, ydata, 'b-', label=i)
@@ -42,7 +42,7 @@ for kind,happen in main_keys:
         plt.xlabel('Days Since The First ' + str(happen) + ' Announced')
         plt.ylabel("Number of Daily "+ happen + "s")
         plt.legend()
-        plt.savefig("Graphs/30_days_"+ str(kind) +"/"+str(i)+".png")
+        plt.savefig("../Covid-19-Country-Graphs/60_days_"+ str(kind) + "/"+str(i)+".png")
         plt.clf()
 
 

@@ -1,5 +1,13 @@
 import os
 import time
+from datetime import date
+
+
+
+commit_date = str(date.today())
+
+
+commit = 'git commit -m "' + commit_date + '"'
 
 t1 = time.time()
 
@@ -7,15 +15,12 @@ t1 = time.time()
 os.system("python3 curve_fitting.py > results.json")
 os.system("python3 plot_curves.py")
 
-os.chdir("/home/goktu/Desktop/Research/Graphs")
-os.system("git init")
-os.system("git add .")
-os.system('git commit -m "May 10"')
-os.system("git remote rm origin")
-os.system('git remote add origin git@github.com:teghub/Covid-19-Country-Graphs.git')
-os.system("git push -f origin master")
+os.chdir("/home/goktu/Desktop/Covid-19-Country-Graphs/")
+os.system("git stage *")
+os.system(commit)
+os.system("git push")
 t2 = time.time()
 seconds = t2-t1
-minutes = seconds//60
-seconds = seconds - minutes*60
+minutes = int(seconds//60)
+seconds = int(seconds - minutes*60)
 print("Execute time is {}:{}".format(minutes,seconds))
