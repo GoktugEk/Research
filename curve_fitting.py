@@ -13,7 +13,8 @@ from sklearn.datasets import make_blobs
 from sklearn.impute import SimpleImputer
 import json
 import random
-
+import warnings
+warnings.simplefilter("ignore")
 
 
 
@@ -64,26 +65,13 @@ def func3(x,a,b,c):
     return a*np.exp(-((x-b)/c)**2) 
 
 
-functions = {"func1" : "a^(b*x) + c^(d*x) + f^(g*x)", "func2" : "x^b","func3" : "a * e ^ -((x-b)/c)**2 + d * e ^ -((x-e)/f)**2 "}
-ydata = []
-name = "Aruba"
+
 popt_results = {"Daily Cases" : {}, "Daily Deaths" : {}, "Daily Tests" : {}}
-country_names = []
-errors = []
-
-
-total_case = 3
-daily_case = 4
-total_death = 5
-daily_death = 6
-daily_tests = 12
-
-situations = [("new_tests","Daily Tests"),("new_cases","Daily Cases"),("new_deaths","Daily Deaths")]
+situations = [("new_cases","Daily Cases"),("new_deaths","Daily Deaths"),("new_tests","Daily Tests")]
 
 
 
 for case,kind in situations:
-
     for i in keys:
         occasions = results[i]
 

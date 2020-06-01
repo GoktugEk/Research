@@ -2,8 +2,6 @@ import os
 import time
 import urllib.request
 from datetime import date
-import warnings
-warnings.simplefilter("ignore")
 
 t1 = time.time()
 
