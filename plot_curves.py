@@ -6,44 +6,57 @@ import time
 def func(x,a,b,c):
     return a*np.exp(-((x-b)/c)**2)
 
+def to_array(lis):
+    lis = np.array(lis)
+
+def make_days(num):
+    xdata = [x for x in range(1,num+1)]
+    return xdata
+
+def get_data(results, index, key):
+    ydata = results[index][key]
+    return ydata
+
+
+def plot(xdata, ydata, params, feature,name, days, subkey):
+    plt.plot(xdata, ydata, 'b-', label=name)
+    xdata = make_days(len(ydata)+days)
+    plt.plot(xdata, func(xdata, *params), 'r-', label='Fit')
+    plt.xlabel('Days Since The First ' + str(feature) + ' Announced')
+    plt.ylabel("Number of Daily "+ feature + "s")
+    plt.legend()
+    plt.savefig("../Covid-19-Country-Graphs/60_days_"+ str(subkey) + "/"+str(name)+".png")
+    plt.clf()
+
+
 
 
 with open("results.json") as file:
     pre_results = json.load(file)
 
 main_keys = [("Daily Cases","Case"), ("Daily Deaths","Death"), ("Daily Tests", "Test")]
-for kind,happen in main_keys:
 
-    keys = pre_results[kind].keys()
+for subkey,feature in main_keys:
+
+    keys = pre_results[subkey].keys()
     keys = list(keys)
-    results = dict(pre_results[kind])
-    print(len(keys))
+    results = dict(pre_results[subkey])
+    print(subkey + "...")
 
     for i in keys:
-        popt = results[i]["Parameters"]
-        popt = np.array(popt)
-        ydata = results[i]["Cases"]
-        xdata = range(1,len(ydata)+1)
-        backup_x = range(1,len(ydata)+1)
+        params = get_data(results,i,"Parameters")
+        ydata = get_data(results, i, "Cases")
+        length = len(ydata)
+        xdata = make_days(length)
+
         xdata = np.array(xdata)
         ydata = np.array(ydata)
+        params = np.array(params)
 
-        plt.plot(xdata, ydata, 'b-', label=i)
-        xdata = range(1,len(ydata)+61)
-        plt.plot(xdata, func(xdata, *popt), 'r-', label='Fit')
-        plt.xlabel('Days Since The First ' + str(happen) + ' Announced')
-        plt.ylabel("Number of Daily "+ happen + "s")
-        plt.legend()
-        plt.savefig("../Covid-19-Country-Graphs/60_days_"+ str(kind) + "/"+str(i)+".png")
-        plt.clf()
-        xdata = range(1,len(ydata)+31)
-        plt.plot(backup_x, ydata, 'b-', label=i)
-        plt.plot(xdata, func(xdata, *popt), 'r-', label='Fit')
-        plt.xlabel('Days Since The First ' + str(happen) + ' Announced')
-        plt.ylabel("Number of Daily "+ happen + "s")
-        plt.legend()
-        plt.savefig("../Covid-19-Country-Graphs/60_days_"+ str(kind) + "/"+str(i)+".png")
-        plt.clf()
+
+        plot(xdata,ydata,params,feature,i,60,subkey)
+        plot(xdata,ydata,params,feature,i,30,subkey)
+
 
 
 

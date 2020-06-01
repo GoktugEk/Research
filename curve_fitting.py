@@ -15,6 +15,43 @@ import json
 import random
 
 
+
+
+
+
+def get_the_data( lis, option): #INPUT : LIST OF DICTIONARIES OF COUNTRY FEATURES
+    ydata = []                  #OUTPUT: xdata: array of days, length is equivalent with ydata            
+    name = lis[0]["location"]   #        ydata: array of desired feature,
+    for i in lis:               #        name: name of the country
+        if option in i.keys() and i[option] != 0:
+            ydata.append(i[option])
+
+    xdata = [x for x in range(1,len(ydata)+1)]
+    xdata = np.array(xdata)
+    ydata = np.array(ydata)
+    return xdata,ydata,name
+
+
+def add_the_data(results, feature, popt, ydata, error, name):
+    results[feature][name] =  {
+                "Parameters": popt, 
+                "Cases" : ydata, 
+                "Error": error
+                }    
+
+
+def fit_and_error(func, xdata, ydata,init):
+    if init:
+        popt,_ = curve_fit(func,xdata,ydata, p0 = [0.5, 0.5, 0.5], maxfev = 999999)
+    else:
+        popt,_ = curve_fit(func,xdata,ydata, p0 = None, maxfev = 999999)
+    error  = mean_absolute_error(ydata,func3(xdata, *popt))
+    popt = popt.tolist()
+    return popt,error
+    
+
+
+
 with open("owid-covid-data.json") as file:
     pre_results = json.load(file)
 
@@ -49,53 +86,25 @@ for case,kind in situations:
 
     for i in keys:
         occasions = results[i]
-        for j in occasions:
-            if not (case in j.keys()):
-                continue
-            number = j[case]
-            if number != 0:
-                ydata.append(int(number))
 
-        name = results[i][0]["location"]
+        xdata,ydata,name = get_the_data(occasions,case)
         
-        if len(ydata) < 10:
-            ydata = []
+        if len(ydata) < 20:
             continue
 
-        xdata = [x for x in range(1,len(ydata)+1)]
-        xdata = np.array(xdata)
-        ydata = np.array(ydata)
 
-        popt3,pcov3 = curve_fit(func3,xdata,ydata, p0 = [0.5, 0.5, 0.5],maxfev = 9999999 )  
-        popt2,pcov2 = curve_fit(func3,xdata,ydata,p0= None,maxfev = 99999999) 
-        error_1 = mean_absolute_error(ydata,func3(xdata, *popt3))
-        error_2 = mean_absolute_error(ydata,func3(xdata, *popt2))
+        param1,error1 = fit_and_error(func3,xdata,ydata,0)
+        param2,error2 = fit_and_error(func3,xdata,ydata,1)
+
         
-        popt3 = popt3.tolist()
-        popt2 = popt2.tolist()
+
         ydata = ydata.tolist()
 
-        if error_1 < error_2:
-            popt_results[kind][name] = {
-                "Parameters": popt3, 
-                "Function" : functions["func3"], 
-                "Cases" : ydata, 
-                "Error": error_1
-                }    
+        if error1 < error2:
+            add_the_data(popt_results,kind, param1, ydata, error1, name)
         else:
-            popt_results[kind][name] = {
-                "Parameters": popt2, 
-                "Function" : functions["func3"], 
-                "Cases" : ydata, 
-                "Error": error_2
-                }  
-        ydata = []
-    
-        
+            add_the_data(popt_results,kind, param2, ydata, error2, name)
 
-
-
-    
 
 popt_results = json.dumps(popt_results,indent= 4)
 print(popt_results)
