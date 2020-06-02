@@ -25,7 +25,7 @@ def plot(xdata, ydata, params, feature,name, days, subkey):
     plt.xlabel('Days Since The First ' + str(feature) + ' Announced')
     plt.ylabel("Number of Daily "+ feature + "s")
     plt.legend()
-    plt.savefig("../Covid-19-Country-Graphs/60_days_"+ str(subkey) + "/"+str(name)+".png")
+    plt.savefig("../Covid-19-Country-Graphs/"+ str(days) +"_days_"+ str(subkey) + "/"+str(name)+".png")
     plt.clf()
 
 
