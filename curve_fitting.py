@@ -16,14 +16,14 @@ import random
 import warnings
 warnings.simplefilter("ignore")
 
-
-
-
-
-def get_the_data( lis, option): #INPUT : LIST OF DICTIONARIES OF COUNTRY FEATURES
-    ydata = []                  #OUTPUT: xdata: array of days, length is equivalent with ydata            
-    name = lis[0]["location"]   #        ydata: array of desired feature,
-    for i in lis:               #        name: name of the country
+#INPUT : LIST OF DICTIONARIES OF COUNTRY FEATURES
+#OUTPUT: xdata: array of days, length is equivalent with ydata
+#        ydata: array of desired feature,
+#        name: name of the country, type = str
+def get_the_data( lis, option): 
+    ydata = []                              
+    name = lis[0]["location"]   
+    for i in lis:               
         if option in i.keys() and i[option] != 0:
             ydata.append(i[option])
 
@@ -32,7 +32,12 @@ def get_the_data( lis, option): #INPUT : LIST OF DICTIONARIES OF COUNTRY FEATURE
     ydata = np.array(ydata)
     return xdata,ydata,name
 
-
+#INPUT: results: Dict has the keys of 3 main keys
+#       feature: The name of the occasion e.g Daily case, Daily Death, Type = str
+#       popt   : Parameters of the fit, type = array
+#       ydata  : Cases of the country, can be deaths, tests or cases, type = array
+#       error  : Error calculated between fitted curve and original curve, type = array
+#METHOD: Adds the given data to the results dictionary under feature key   
 def add_the_data(results, feature, popt, ydata, error, name):
     results[feature][name] =  {
                 "Parameters": popt, 
@@ -40,13 +45,19 @@ def add_the_data(results, feature, popt, ydata, error, name):
                 "Error": error
                 }    
 
-
+#INPUT:  func  : Function will be used for curve fitting
+#        xdata : x axis of the graph, type = array
+#        ydata : cases of the country, type = array
+#        init  : Variable decides whether curve fit used with initalized parameters or not. 1 = init, 0 = regular
+#RETURN: popt  : Parameters fitted to the function by curve fit function
+#        error : Error calculated between fitted curve and original curve
+#METHOD: Calculates fitted parameters and errors with the functions curve_fit and mean_absolute_error, returns the output
 def fit_and_error(func, xdata, ydata,init):
     if init:
         popt,_ = curve_fit(func,xdata,ydata, p0 = [0.5, 0.5, 0.5], maxfev = 999999)
     else:
         popt,_ = curve_fit(func,xdata,ydata, p0 = None, maxfev = 999999)
-    error  = mean_absolute_error(ydata,func3(xdata, *popt))
+    error  = mean_absolute_error(ydata,func(xdata, *popt))
     popt = popt.tolist()
     return popt,error
     
@@ -61,17 +72,20 @@ keys = list(keys)
 results = dict(pre_results)
 
 
-def func3(x,a,b,c):
+# Model function for the curve fitting.
+# a,b,c are the parameters, x is the data, type = array
+def func(x,a,b,c):
     return a*np.exp(-((x-b)/c)**2) 
 
 
 
 popt_results = {"Daily Cases" : {}, "Daily Deaths" : {}, "Daily Tests" : {}}
-situations = [("new_cases","Daily Cases"),("new_deaths","Daily Deaths"),("new_tests","Daily Tests")]
+main_keys = [("new_cases","Daily Cases"),("new_deaths","Daily Deaths"),("new_tests","Daily Tests")]
 
 
 
-for case,kind in situations:
+for case,kind in main_keys:
+
     for i in keys:
         occasions = results[i]
 
@@ -81,8 +95,8 @@ for case,kind in situations:
             continue
 
 
-        param1,error1 = fit_and_error(func3,xdata,ydata,0)
-        param2,error2 = fit_and_error(func3,xdata,ydata,1)
+        param1,error1 = fit_and_error(func,xdata,ydata,0)
+        param2,error2 = fit_and_error(func,xdata,ydata,1)
 
         
 
