@@ -8,8 +8,9 @@ import time
 def func(x,a,b,c):
     return a*np.exp(-((x-b)/c)**2)
 
-#INPUT :  num: number of the days equivelent to the ydata, which is the length of the array of cases/tests/deaths, type = int
-#RETURN:  xdata: x axis of the graph, type = array
+#INPUT :  num: length of desired list
+#RETURN:  xdata: x axis of the graph, type = list
+#METHOD:  returns a list starts from 1 to num+1
 def make_days(num):
     xdata = [x for x in range(1,num+1)]
     return xdata
