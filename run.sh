@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python3 load.py ##
+wget --output-document=owid-covid-data.json https://covid.ourworldindata.org/data/owid-covid-data.json ##
 
 echo -ne "Fitting curves...               \r" ##
 python3 curve_fitting.py > results.json ##
