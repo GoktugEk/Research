@@ -7,56 +7,54 @@ Created on Tue Mar 31 00:32:08 2020
 from scipy.optimize import curve_fit
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_absolute_error
-import json
+import pandas as pd
 import warnings
-from header import func
-import header as h
 
 warnings.simplefilter("ignore")
 
 
+def clear_zeros(lis):
+    for i in range(len(lis)):
+        if lis[i] == 0:
+            lis[i] = 0.1
+        elif str(lis[i]) == 'nan':
+            lis[i] = lis[i-1]
+    return lis
 
-with open("owid-covid-data.json") as file:
-    pre_results = json.load(file)
-
-keys = pre_results.keys()
-keys = list(keys)
-results = dict(pre_results)
-
-
-popt_results = {"Daily Cases" : {}, "Daily Deaths" : {}, "Daily Tests" : {}}
-main_keys = [("new_cases","Daily Cases"),("new_deaths","Daily Deaths"),("new_tests","Daily Tests")]
-
+def func(x,a,b,c,d,e,f):
+    return int(a) * x + b * np.square(x) + c + d*np.exp(-((x-e)/f)**2)
 
 
-for case,kind in main_keys:
+df = pd.read_csv("owid-covid-data.csv")
 
-    for i in keys:
-            
-        ydata,name = h.get_the_data(results, i,case)
-        
-        xdata = h.make_days(len(ydata))
-
-        xdata = np.array(xdata)
-        ydata = np.array(ydata)
-        
-        if len(ydata) < 20:
-            continue
+cnts = df.location.unique()
 
 
-        param1,error1 = h.fit_and_error(func,xdata,ydata,0)
-        param2,error2 = h.fit_and_error(func,xdata,ydata,1)
+for cnt in cnts:
+    cnt_df = df[df["location"] == cnt]
 
-        
+    fts = ['new_cases', 'new_deaths', 'new_tests']
+    names = {'new_cases' : 'Case', 'new_deaths' : 'Death', 'new_tests' : 'Test'}
+    for ft in fts:
+        arr = cnt_df[ft].dropna().to_numpy()
+        arr = clear_zeros(arr)
 
-        ydata = ydata.tolist()
+        if len(arr) < 20:
+            break
 
-        if error1 < error2:
-            h.add_the_data(popt_results,kind, param1, ydata, error1, name)
-        else:
-            h.add_the_data(popt_results,kind, param2, ydata, error2, name)
+        days = [x for x in range(1, len(arr) + 1)]
+
+        try:
+            params,_ = curve_fit(func, days, arr, maxfev=10000000)
+        except:
+            break
+        plt.plot(days, arr, 'b.', label=cnt)
+        days = [x for x in range(1, len(arr) + 31)]
+        plt.plot(days, func(days, *params), 'r-', label='Fit')
+        plt.xlabel('Days Since The First ' + names[ft] + ' Announced')
+        plt.ylabel("Number of Daily " + names[ft] + "s")
+        plt.legend()
+        plt.savefig("../Graphs/Covid-19-Country-Graphs/" + str(ft) + "/" + str(cnt) + ".png")
+        plt.clf()
 
 
-popt_results = json.dumps(popt_results,indent= 4)
-print(popt_results)

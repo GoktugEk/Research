@@ -1,14 +1,9 @@
 #!/bin/bash
 
-wget --output-document=owid-covid-data.json https://covid.ourworldindata.org/data/owid-covid-data.json ##
+wget --output-document=owid-covid-data.csv https://covid.ourworldindata.org/data/owid-covid-data.csv ##
 
 echo -ne "Fitting curves...               \r" ##
-python3 curve_fitting.py > results.json ##
-echo -ne '#########...................(33%)\r'
-
-echo "Ploting curves...                      " ##
-python3 plot_curves.py ##
-echo -ne '##################..........(66%)\r'
+python3 curve_fitting.py ##
 
 cd .. ##
 cd Covid-19-Country-Graphs/ ##
